@@ -1,0 +1,24 @@
+import itertools
+import sys
+
+
+
+
+def isAnagrama(frase,anagrama):
+    
+    frase=sorted(frase)
+    anagrama=sorted(anagrama)
+    
+    if (cmp(frase,anagrama)==0):
+        return 1
+    else:
+        return 0
+
+n=int(input())
+for i in range(n):
+    line=sys.stdin.readline().strip()
+    arreglo=line.split(' ')
+    if isAnagrama(list(arreglo[0]),list(arreglo[1])):
+        print ('true')
+    else:
+        print ('false')

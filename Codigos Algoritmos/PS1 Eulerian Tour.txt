@@ -1,0 +1,88 @@
+def find_eulerian_tour(graph):
+#    lista=[0]*150
+    
+ #   for arista in graph:
+  #      lista[arista[0]]+=1
+   #     lista[arista[1]]+=1
+    # 
+    #for frec in lista:
+     #   if frec%2!=0:
+      #      return None
+        
+        
+# your code here
+    print graph
+#Get degrees for each node
+    degrees = {}
+    for first, second in graph:
+        print first, second
+        if first not in degrees:
+            degrees[first] = 1
+        else:
+            degrees[first] += 1
+        if second not in degrees:
+            degrees[second] = 1
+        else:
+            degrees[second] += 1
+    print degrees.keys()
+    print degrees
+    node_list = degrees.items()
+    node_list = [(k, j) for j, k in node_list]
+    node_list.sort(reverse=True)
+    print node_list
+    node_list = [k for j, k in node_list]
+    print node_list
+#Are there any nodes with odd degrees
+    odd_nodes = []
+    for node in node_list:
+        if degrees[node] % 2 == 1:
+            odd_nodes.append(node)
+    if odd_nodes:
+        start_node = odd_nodes[0]
+    else:
+        start_node = node_list[0]
+    tour = [start_node]
+    current_node = start_node
+    node_list.reverse()
+    while (True):
+        flag = 0
+        for next_node in node_list:
+            if current_node == next_node:
+                continue
+            for first, second in graph:
+                if current_node == first:
+                    if (second == next_node and second not in odd_nodes) or (second in odd_nodes and len(graph) == 1):
+                        graph.remove((first, second))
+                        tour.append(second)
+                        current_node = second
+                        flag = 1
+                        break
+                elif current_node == second:
+                    if (first == next_node and first not in odd_nodes) or (first in odd_nodes and len(graph) == 1):
+                        graph.remove((first, second))
+                        tour.append(first)
+                        current_node = first
+                        flag = 1
+                        break
+            if flag:
+                break
+        else:
+            if not flag:
+                print "ERROR"
+                print graph
+                print tour
+                return tour
+        print "Tour so far"
+        print tour
+        print "Remaining Graph"
+        print graph
+        if graph:
+            continue
+        else:
+            break
+    return tour
+
+
+
+use_harder_tests=True
+print find_eulerian_tour([(1, 2), (2, 3), (3, 1)])

@@ -1,0 +1,8 @@
+import csv
+
+def read_graph(filename):
+    # Read an undirected graph in CSV format. Each line is an edge
+    tsv = csv.reader(open(filename), delimiter='\t')
+    G = {}
+    for (node1, node2) in tsv: make_link(G, node1, node2)
+    return G

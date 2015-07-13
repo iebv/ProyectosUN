@@ -1,0 +1,164 @@
+CS215Unit3Code
+CS215Unit3Code is ...
+
+Lecture 5: Clustering Coefficient Code
+
+def make_link(G, node1, node2):
+    if node1 not in G:
+        G[node1] = {}
+    (G[node1])[node2] = 1
+    if node2 not in G:
+        G[node2] = {}
+    (G[node2])[node1] = 1
+    return G
+
+flights = [("ORD", "SEA"), ("ORD", "LAX"), ('ORD', 'DFW'), ('ORD', 'PIT'),
+          ('SEA', 'LAX'), ('LAX', 'DFW'), ('ATL', 'PIT'), ('ATL', 'RDU'),
+          ('RDU', 'PHL'), ('PIT', 'PHL'), ('PHL', 'PVD')]
+
+G = {}
+for (x,y) in flights: make_link(G,x,y)
+
+def clustering_coefficient(G,v):
+    neighbors = G[v].keys()
+    if len(neighbors) == 1: return -1.0
+    links = 0
+    for w in neighbors:
+        for u in neighbors:
+            if u in G[w]: links += 0.5
+    return 2.0*links/(len(neighbors)*(len(neighbors)-1))
+
+print clustering_coefficient(G,"ORD")
+
+total = 0
+for v in G.keys():
+    total += clustering_coefficient(G,v)
+
+print total/len(G)
+Lecture 7: Connected Components Code:
+
+def make_link(G, node1, node2):
+    if node1 not in G:
+        G[node1] = {}
+    (G[node1])[node2] = 1
+    if node2 not in G:
+        G[node2] = {}
+    (G[node2])[node1] = 1
+    return G
+
+connections = [('a', 'g'), ('a', 'd'), ('d', 'g'), ('g', 'c'), ('b', 'f'),
+               ('f', 'e'), ('e', 'h')]
+
+G = {}
+for (x,y) in connections: make_link(G,x,y)
+
+###################################################################
+# Transversal...
+#  Call this routine on nodes being visited for the first time
+def mark_component(G, node, marked):
+    marked[node] = True
+    total_marked = 1
+    for neighbor in G[node]:
+        if neighbor not in marked:
+            total_marked += mark_component(G, neighbor, marked)
+    return total_marked
+
+def list_component_sizes(G):
+    marked = {}
+    for node in G.keys():
+        if node not in marked:
+            print "Component containing", node, ": ", mark_component(G, node, marked)
+
+list_component_sizes(G)
+Lecture 9: Checking Pairwise Connectivity (Solution)
+
+def mark_component(G, node, marked):
+    marked[node] = True
+    total_marked = 1
+    for neighbor in G[node]:
+        if neighbor not in marked:
+            total_marked += mark_component(G, neighbor, marked)
+    return total_marked
+
+def check_connection(G, v1, v2):
+    marked = {}
+    mark_component(G, v1, marked)
+    return v2 in marked
+Lecture 17: BFS Code
+
+import csv
+
+def make_link(G, node1, node2):
+    if node1 not in G:
+        G[node1] = {}
+    (G[node1])[node2] = 1
+    if node2 not in G:
+        G[node2] = {}
+    (G[node2])[node1] = 1
+    return G
+
+def read_graph(filename):
+    # Read an undirected graph in CSV format. Each line is an edge
+    tsv = csv.reader(open(filename), delimiter='\t')
+    G = {}
+    for (node1, node2) in tsv: make_link(G, node1, node2)
+    return G
+
+# Read the marvel comics graph
+marvelG = read_graph('uniq_edges.tsv')
+
+# distance from start (original)
+def distance(G, v1, v2):
+    distance_from_start = {}
+    open_list = [v1]
+    distance_from_start[v1] = 0
+    while len(open_list) > 0:
+        current = open_list[0]
+        del open_list[0]
+        for neighbor in G[current].keys():
+            if neighbor not in distance_from_start:
+                distance_from_start[neighbor] = distance_from_start[current] + 1
+                if neighbor == v2: return distance_from_start[v2]
+                open_list.append(neighbor)
+    return False
+
+# path from start (after modification on distance())
+def path(G, v1, v2):
+    #distance_from_start = {}
+    path_from_start = {} # modification
+    open_list = [v1]
+    #distance_from_start[v1] = 0
+    path_from_start[v1] = [v1] # modification
+    while len(open_list) > 0:
+        current = open_list[0]
+        del open_list[0]
+        for neighbor in G[current].keys():
+            #if neighbor not in distance_from_start:
+            if neighbor not in path_from_start: # modification
+                #distance_from_start[neighbor] = distance_from_start[current] + 1
+                path_from_start[neighbor] = path_from_start[current] 
+                                              + [neighbor] # modification
+                #if neighbor == v2: return distance_from_start[v2]
+                if neighbor == v2: return path_from_start[v2] # modification
+                open_list.append(neighbor)
+    return False
+
+from_node = "A"
+to_node = "ZZZAX"
+
+print distance(marvelG, from_node, to_node)
+print path(marvelG, from_node, to_node)
+Lesson 19: Centrality
+
+def centrality(G, v):
+    distance_from_start = {}
+    open_list = [v]
+    distance_from_start[v] = 0
+    while len(open_list) > 0:
+        current = open_list[0]
+        del open_list[0]
+        for neighbor in G[current].keys():
+            if neighbor not in distance_from_start:
+                distance_from_start[neighbor] = distance_from_start[current] + 1
+                open_list.append(neighbor)
+    return float(sum(distance_from_start.values()))/len(distance_from_start)

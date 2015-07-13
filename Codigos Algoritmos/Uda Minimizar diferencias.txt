@@ -1,0 +1,34 @@
+#
+# Given a list of numbers, L, find a number, x, that
+# minimizes the sum of the absolute value of the difference
+# between each element in L and x: SUM_{i=0}^{n-1} |L[i] - x|
+# 
+# Your code should run in Theta(n) time
+#
+
+def minimize_absolute(L):
+    lenL=len(L)
+    if lenL%2==1:
+        k = int((lenL)/2 +1)
+    else:
+        k = int((lenL)/2)
+    subList = L
+    left = []
+    right = []
+    pivot = subList[len(subList)/2]
+    while True:
+        for e in subList:
+            if e<pivot:
+                left.append(e)
+            elif e>pivot:
+                right.append(e)
+        if len(left)>=k:
+            subList = left
+        elif (len(subList) - len(right))<k:
+            k = k-(len(subList) - len(right))
+            subList = right
+        else:
+            return pivot
+        pivot = subList[int(len(subList)/2)]
+        left = []
+        right = []
